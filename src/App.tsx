@@ -1,4 +1,7 @@
 import React, { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import NavHeader from "./components/NavHeader";
+import SectionHeading from "./components/SectionHeading";
+import ShirtGalleryModal from "./components/store/ShirtGalleryModal";
 
 type UserRole = "" | "pastor" | "siervo";
 type ShirtSize = "" | "CH" | "M" | "G" | "XG" | "2XG";
@@ -60,30 +63,6 @@ const initialFormState: FormState = {
   paymentMethod: "",
   attendeeFile: null,
 };
-
-const availableShirts = [
-  {
-    id: 1,
-    name: "Playera Oficial Blanca",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
-    description: "Playera oficial blanca del evento.",
-  },
-  {
-    id: 2,
-    name: "Playera Oficial Negra",
-    image:
-      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=1200&q=80",
-    description: "Playera oficial negra del evento.",
-  },
-  {
-    id: 3,
-    name: "Playera Edición Especial",
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=80",
-    description: "Diseño conmemorativo Soy de Cristo México 2026.",
-  },
-];
 
 export default function EventAttendanceForm() {
   const [formData, setFormData] = useState<FormState>(initialFormState);
@@ -263,7 +242,7 @@ export default function EventAttendanceForm() {
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <ResponsiveHeader />
+      <NavHeader />
 
       <section className="px-4 py-6 sm:px-6 lg:px-8">
         <div
@@ -275,18 +254,6 @@ export default function EventAttendanceForm() {
             onSubmit={handleSubmit}
             className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
           >
-            <div className="mb-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-                Formulario de asistencia
-              </p>
-              <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-                Registro de asistentes al evento
-              </h1>
-              <p className="mt-2 text-sm text-slate-600 sm:text-base">
-                Este formulario está enfocado en llevar el inventario de las
-                personas que asistirán al evento. La compra de playera es opcional.
-              </p>
-            </div>
 
             {formError ? (
               <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -296,11 +263,12 @@ export default function EventAttendanceForm() {
 
             <section>
               <SectionHeading
-                title="Datos del asistente"
+                title="Información del asistente"
                 description="Captura la información principal de la persona que asistirá al evento."
+                badge="Los siguientes datos son obligatorios"
               />
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <FieldWrapper label="Nombre completo" htmlFor="fullName" required>
                   <input
                     id="fullName"
@@ -547,6 +515,7 @@ export default function EventAttendanceForm() {
                     <SectionHeading
                       title="Método de pago"
                       description="Este apartado solo aparece porque la compra de playera está activada."
+                      
                     />
 
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -557,22 +526,6 @@ export default function EventAttendanceForm() {
                         onChange={handleInputChange}
                         title="Stripe"
                         description="Pago con tarjeta."
-                      />
-                      <PaymentOption
-                        id="mercado-pago"
-                        value="mercado-pago"
-                        checked={formData.paymentMethod === "mercado-pago"}
-                        onChange={handleInputChange}
-                        title="Mercado Pago"
-                        description="Pago en línea para México y Latam."
-                      />
-                      <PaymentOption
-                        id="conekta"
-                        value="conekta"
-                        checked={formData.paymentMethod === "conekta"}
-                        onChange={handleInputChange}
-                        title="Conekta"
-                        description="Tarjeta, efectivo o transferencia."
                       />
                       <PaymentOption
                         id="transferencia"
@@ -704,43 +657,6 @@ export default function EventAttendanceForm() {
   );
 }
 
-function ResponsiveHeader() {
-  return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
-            <img
-              src="https://via.placeholder.com/96x96.png?text=Evento"
-              alt="Logo del evento"
-              className="h-20 w-20 rounded-2xl object-cover ring-1 ring-slate-200"
-            />
-
-            <div className="text-center sm:text-left">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-                Soy de Cristo México 2026
-              </p>
-              <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl">
-                Registro de asistentes
-              </h2>
-              <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                Formulario responsivo para control de asistencia y compra opcional de playeras.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <img
-              src="https://via.placeholder.com/96x96.png?text=Iglesia"
-              alt="Logo de la iglesia"
-              className="h-20 w-20 rounded-2xl object-cover ring-1 ring-slate-200"
-            />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 type PreviewCardProps = {
   title: string;
@@ -761,76 +677,6 @@ function PreviewCard({ title, previewUrl, className = "" }: PreviewCardProps) {
   );
 }
 
-type ShirtGalleryModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-function ShirtGalleryModal({ isOpen, onClose }: ShirtGalleryModalProps) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6">
-      <div className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900">
-              Galería de playeras disponibles
-            </h3>
-            <p className="text-sm text-slate-500">
-              Diseños disponibles para compra opcional.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-          >
-            Cerrar
-          </button>
-        </div>
-
-        <div className="grid max-h-[75vh] gap-5 overflow-y-auto p-5 sm:grid-cols-2 lg:grid-cols-3">
-          {availableShirts.map((shirt) => (
-            <article
-              key={shirt.id}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
-            >
-              <img
-                src={shirt.image}
-                alt={shirt.name}
-                className="h-72 w-full object-cover"
-              />
-              <div className="p-4">
-                <h4 className="text-base font-semibold text-slate-900">
-                  {shirt.name}
-                </h4>
-                <p className="mt-2 text-sm text-slate-600">
-                  {shirt.description}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type SectionHeadingProps = {
-  title: string;
-  description: string;
-};
-
-function SectionHeading({ title, description }: SectionHeadingProps) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-      <p className="text-sm text-slate-500">{description}</p>
-    </div>
-  );
-}
 
 type FieldWrapperProps = {
   label: string;
