@@ -1,7 +1,10 @@
-import React, { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import { type ChangeEvent, FormEvent, useMemo, useState } from "react";
 import NavHeader from "./components/NavHeader";
 import SectionHeading from "./components/SectionHeading";
 import ShirtGalleryModal from "./components/store/ShirtGalleryModal";
+import FormRegister from "./components/FormRegister";
+import FieldWrapperInput from "./components/views/FieldWrapperInput";
+import { inputClassName } from "./utils/utils";
 
 type UserRole = "" | "pastor" | "siervo";
 type ShirtSize = "" | "CH" | "M" | "G" | "XG" | "2XG";
@@ -137,24 +140,6 @@ export default function EventAttendanceForm() {
     }));
   };
 
-  const handleAttendeeFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] ?? null;
-
-    setFormError("");
-
-    setFormData((previousState) => ({
-      ...previousState,
-      attendeeFile: selectedFile,
-    }));
-
-    if (selectedFile && selectedFile.type.startsWith("image/")) {
-      const objectUrl = URL.createObjectURL(selectedFile);
-      setAttendeePreviewUrl(objectUrl);
-    } else {
-      setAttendeePreviewUrl("");
-    }
-  };
-
   const handlePastorIdFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] ?? null;
 
@@ -268,114 +253,9 @@ export default function EventAttendanceForm() {
                 badge="Los siguientes datos son obligatorios"
               />
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FieldWrapper label="Nombre completo" htmlFor="fullName" required>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="Ej. César Valentín"
-                    required
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Correo electrónico" htmlFor="email" required>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="ejemplo@correo.com"
-                    required
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Teléfono" htmlFor="phone" required>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="55 1234 5678"
-                    required
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Edad" htmlFor="age">
-                  <input
-                    id="age"
-                    name="age"
-                    type="number"
-                    min="1"
-                    value={formData.age}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="Ej. 25"
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Iglesia" htmlFor="churchName">
-                  <input
-                    id="churchName"
-                    name="churchName"
-                    type="text"
-                    value={formData.churchName}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="Ebenezer Príncipe de Paz"
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Ciudad" htmlFor="city">
-                  <input
-                    id="city"
-                    name="city"
-                    type="text"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    placeholder="Ciudad de México"
-                  />
-                </FieldWrapper>
-
-                <FieldWrapper label="Rol" htmlFor="role" required>
-                  <select
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                    className={inputClassName}
-                    required
-                  >
-                    <option value="">Selecciona un rol</option>
-                    <option value="pastor">Pastor</option>
-                    <option value="siervo">Siervo</option>
-                  </select>
-                </FieldWrapper>
-
-                <FieldWrapper
-                  label="Foto o archivo del asistente"
-                  htmlFor="attendeeFile"
-                  helperText="En móvil puede abrir la cámara o galería. En desktop permite subir archivo."
-                >
-                  <input
-                    id="attendeeFile"
-                    name="attendeeFile"
-                    type="file"
-                    accept="image/*,.pdf"
-                    capture="environment"
-                    onChange={handleAttendeeFileChange}
-                    className={fileInputClassName}
-                  />
-                </FieldWrapper>
-              </div>
+              <FormRegister 
+                handleInputChangeForm={handleInputChange}
+              />
 
               {attendeePreviewUrl ? (
                 <PreviewCard
@@ -386,7 +266,7 @@ export default function EventAttendanceForm() {
 
               {formData.role === "pastor" ? (
                 <div className="mt-5 rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
-                  <FieldWrapper
+                  <FieldWrapperInput
                     label="Identificación de pastor"
                     htmlFor="pastorIdFile"
                     required
@@ -402,7 +282,7 @@ export default function EventAttendanceForm() {
                       className={fileInputClassName}
                       required={formData.role === "pastor"}
                     />
-                  </FieldWrapper>
+                  </FieldWrapperInput>
 
                   {pastorIdPreviewUrl ? (
                     <PreviewCard
@@ -414,7 +294,7 @@ export default function EventAttendanceForm() {
                 </div>
               ) : null}
 
-              <FieldWrapper
+              <FieldWrapperInput
                 label="Notas adicionales"
                 htmlFor="notes"
                 className="mt-4"
@@ -429,7 +309,7 @@ export default function EventAttendanceForm() {
                   className={`${inputClassName} resize-none`}
                   placeholder="Escribe aquí alguna observación adicional..."
                 />
-              </FieldWrapper>
+              </FieldWrapperInput>
             </section>
 
             <section className="mt-8 border-t border-slate-200 pt-6">
@@ -479,7 +359,7 @@ export default function EventAttendanceForm() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <FieldWrapper label="Talla" htmlFor="shirtSize" required>
+                    <FieldWrapperInput label="Talla" htmlFor="shirtSize" required>
                       <select
                         id="shirtSize"
                         name="shirtSize"
@@ -495,9 +375,9 @@ export default function EventAttendanceForm() {
                         <option value="XG">XG</option>
                         <option value="2XG">2XG</option>
                       </select>
-                    </FieldWrapper>
+                    </FieldWrapperInput>
 
-                    <FieldWrapper label="Cantidad" htmlFor="shirtQuantity" required>
+                    <FieldWrapperInput label="Cantidad" htmlFor="shirtQuantity" required>
                       <input
                         id="shirtQuantity"
                         name="shirtQuantity"
@@ -508,7 +388,7 @@ export default function EventAttendanceForm() {
                         className={inputClassName}
                         required={formData.wantsShirt}
                       />
-                    </FieldWrapper>
+                    </FieldWrapperInput>
                   </div>
 
                   <div className="border-t border-slate-200 pt-5">
@@ -678,39 +558,6 @@ function PreviewCard({ title, previewUrl, className = "" }: PreviewCardProps) {
 }
 
 
-type FieldWrapperProps = {
-  label: string;
-  htmlFor: string;
-  required?: boolean;
-  helperText?: string;
-  className?: string;
-  children: React.ReactNode;
-};
-
-function FieldWrapper({
-  label,
-  htmlFor,
-  required = false,
-  helperText,
-  className = "",
-  children,
-}: FieldWrapperProps) {
-  return (
-    <div className={className}>
-      <label
-        htmlFor={htmlFor}
-        className="mb-1.5 block text-sm font-medium text-slate-700"
-      >
-        {label}
-        {required ? <span className="ml-1 text-rose-500">*</span> : null}
-      </label>
-      {children}
-      {helperText ? (
-        <p className="mt-1 text-xs text-slate-500">{helperText}</p>
-      ) : null}
-    </div>
-  );
-}
 
 type PaymentOptionProps = {
   id: string;
@@ -801,8 +648,7 @@ function getRoleLabel(role: UserRole) {
   }
 }
 
-const inputClassName =
-  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100";
+
 
 const fileInputClassName =
   "block w-full rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-cyan-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-cyan-700";
