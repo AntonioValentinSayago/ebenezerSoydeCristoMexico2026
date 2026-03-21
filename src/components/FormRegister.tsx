@@ -29,6 +29,7 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
         attendeeFile: null,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [formData, setFormData] = useState<FormState>(initialFormState);
     return (
         <div className="grid gap-4 sm:grid-cols-3">

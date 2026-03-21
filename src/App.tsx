@@ -1,4 +1,4 @@
-import { type ChangeEvent, FormEvent, useMemo, useState } from "react";
+import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
 import NavHeader from "./components/NavHeader";
 import SectionHeading from "./components/SectionHeading";
 import ShirtGalleryModal from "./components/store/ShirtGalleryModal";
