@@ -226,7 +226,7 @@ export default function EventAttendanceForm() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100">
+    <main className="min-h-screen bg-linear-to-b from-slate-100 to-red-200">
       <NavHeader />
 
       <section className="px-4 py-6 sm:px-6 lg:px-8">
@@ -248,9 +248,8 @@ export default function EventAttendanceForm() {
 
             <section>
               <SectionHeading
-                title="Información del asistente"
-                description="Captura la información principal de la persona que asistirá al evento."
-                badge="Los siguientes datos son obligatorios"
+                title="Formulario de Resgitro"
+                description="Iinformación de la persona que asistirá al evento."
               />
 
               <FormRegister 
@@ -294,29 +293,9 @@ export default function EventAttendanceForm() {
                 </div>
               ) : null}
 
-              <FieldWrapperInput
-                label="Notas adicionales"
-                htmlFor="notes"
-                className="mt-4"
-                helperText="Información opcional para el equipo organizador."
-              >
-                <textarea
-                  id="notes"
-                  name="notes"
-                  rows={4}
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  className={`${inputClassName} resize-none`}
-                  placeholder="Escribe aquí alguna observación adicional..."
-                />
-              </FieldWrapperInput>
             </section>
 
             <section className="mt-8 border-t border-slate-200 pt-6">
-              <SectionHeading
-                title="Compra opcional de playera"
-                description="Activa esta opción únicamente si el asistente desea comprar una playera oficial."
-              />
 
               <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <input
@@ -328,11 +307,10 @@ export default function EventAttendanceForm() {
                 />
                 <div>
                   <p className="font-medium text-slate-800">
-                    Desea comprar playera oficial
+                    ¿Desea comprar playera oficial?
                   </p>
                   <p className="text-sm text-slate-500">
-                    Solo si activas esta opción se mostrarán talla, cantidad,
-                    galería, método de pago y resumen de compra.
+                    Ver opciones disponibles.
                   </p>
                 </div>
               </label>
@@ -394,8 +372,6 @@ export default function EventAttendanceForm() {
                   <div className="border-t border-slate-200 pt-5">
                     <SectionHeading
                       title="Método de pago"
-                      description="Este apartado solo aparece porque la compra de playera está activada."
-                      
                     />
 
                     <div className="grid gap-3 sm:grid-cols-2">

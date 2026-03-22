@@ -33,7 +33,7 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
     console.log(setFormData)
     return (
         <div className="grid gap-4 sm:grid-cols-3">
-            <FieldWrapperInput label="Nombre completo" htmlFor="fullName" required>
+            <FieldWrapperInput label="Nombre (S)" htmlFor="fullName" required>
                 <input
                     id="fullName"
                     name="fullName"
@@ -41,12 +41,22 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                     value={formData.fullName}
                     onChange={handleInputChangeForm}
                     className={inputClassName}
-                    placeholder="Ej. César Valentín"
+                    required
+                />
+            </FieldWrapperInput>
+                        <FieldWrapperInput label="Apellidos" htmlFor="fullName" required>
+                <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    value={formData.fullName}
+                    onChange={handleInputChangeForm}
+                    className={inputClassName}
                     required
                 />
             </FieldWrapperInput>
 
-            <FieldWrapperInput label="Correo electrónico" htmlFor="email" required>
+            <FieldWrapperInput label="Correo electrónico" htmlFor="email">
                 <input
                     id="email"
                     name="email"
@@ -59,7 +69,7 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                 />
             </FieldWrapperInput>
 
-            <FieldWrapperInput label="Teléfono" htmlFor="phone" required>
+            <FieldWrapperInput label="Teléfono" htmlFor="phone">
                 <input
                     id="phone"
                     name="phone"
@@ -82,30 +92,6 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                     onChange={handleInputChangeForm}
                     className={inputClassName}
                     placeholder="Ej. 25"
-                />
-            </FieldWrapperInput>
-
-            <FieldWrapperInput label="Iglesia" htmlFor="churchName">
-                <input
-                    id="churchName"
-                    name="churchName"
-                    type="text"
-                    value={formData.churchName}
-                    onChange={handleInputChangeForm}
-                    className={inputClassName}
-                    placeholder="Ebenezer Príncipe de Paz"
-                />
-            </FieldWrapperInput>
-
-            <FieldWrapperInput label="Ciudad" htmlFor="city">
-                <input
-                    id="city"
-                    name="city"
-                    type="text"
-                    value={formData.city}
-                    onChange={handleInputChangeForm}
-                    className={inputClassName}
-                    placeholder="Ciudad de México"
                 />
             </FieldWrapperInput>
 

@@ -22,12 +22,9 @@ export const getMexicoDate = (): string => {
     year: "numeric",
   };
 
-  // Usamos 'es-MX' para asegurar que el nombre del mes sea en español
   const formatter = new Intl.DateTimeFormat("es-MX", options);
   const parts = formatter.format(new Date());
 
-  // Pequeño ajuste decorativo para usar "del" en lugar de "de" para el año
-  // Resultado: "20 de marzo de 2026" -> "20 de marzo del 2026"
   return parts.replace(/ de (\d{4})/, " del $1");
 };
 
