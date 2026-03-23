@@ -106,7 +106,7 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                 >
                     <option value="">Selecciona un rol</option>
                     <option value="pastor">Pastor</option>
-                    <option value="siervo">Siervo</option>
+                    <option value="siervo">Asistente del Congreso</option>
                 </select>
             </FieldWrapperInput>
         </div>
