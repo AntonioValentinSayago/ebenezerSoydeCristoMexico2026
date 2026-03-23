@@ -21,7 +21,7 @@ const FieldWrapperInput = (
         <div className={className}>
             <label
                 htmlFor={htmlFor}
-                className="mb-1.5 block text-sm font-medium text-slate-700"
+                className="mb-1.5 block text-sm/6 font-medium text-white"
             >
                 {label}
                 {required ? <span className="ml-1 text-rose-500">*</span> : null}

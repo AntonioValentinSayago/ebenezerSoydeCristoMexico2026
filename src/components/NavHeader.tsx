@@ -1,5 +1,5 @@
 import logoEbenezer  from "../assets/logo-vertical.jpg"
-import logoSoydeCristo2026 from "../assets/logoSoydeCristo2026-letrasNegras.png"
+import logoSoydeCristo2026 from "../assets/logoSoydeCristo2026-letrasBlancas.png"
 
 const NavHeader = () => {
     return (
@@ -10,7 +10,7 @@ const NavHeader = () => {
                         <img
                             src={logoSoydeCristo2026}
                             alt="Logo del evento"
-                            className="h-30 w-55 rounded-2xl object-cover ring-1 ring-slate-300"
+                            className="h-30 w-60 rounded-2xl object-cover ring-1 ring-slate-300"
                         />
                     </div>
 
@@ -18,7 +18,7 @@ const NavHeader = () => {
                         <img
                             src={logoEbenezer}
                             alt="Iglesia Ebenezer Principe de Paz"
-                            className="h-30 w-30 rounded-2xl object-cover ring-1 ring-slate-200"
+                            className="h-30 w-25 rounded-2xl object-cover ring-1 ring-slate-200"
                         />
                     </div>
                 </div>

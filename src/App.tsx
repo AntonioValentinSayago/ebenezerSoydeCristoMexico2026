@@ -5,6 +5,7 @@ import ShirtGalleryModal from "./components/store/ShirtGalleryModal";
 import FormRegister from "./components/FormRegister";
 import FieldWrapperInput from "./components/views/FieldWrapperInput";
 import { inputClassName } from "./utils/utils";
+import bgImage from "./assets/fondoSoydeCristoRojo.jpg"
 
 type UserRole = "" | "pastor" | "siervo";
 type ShirtSize = "" | "CH" | "M" | "G" | "XG" | "2XG";
@@ -226,7 +227,9 @@ export default function EventAttendanceForm() {
   };
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-slate-100 to-red-200">
+    <main className="min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
       <NavHeader />
 
       <section className="px-4 py-6 sm:px-6 lg:px-8">
@@ -237,7 +240,7 @@ export default function EventAttendanceForm() {
         >
           <form
             onSubmit={handleSubmit}
-            className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
+            className="rounded-3xl bg-zinc-900 text-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
           >
 
             {formError ? (
@@ -401,7 +404,7 @@ export default function EventAttendanceForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center rounded-2xl bg-cyan-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex items-center justify-center rounded-2xl bg-red-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSubmitting ? "Guardando..." : "Guardar registro"}
               </button>
