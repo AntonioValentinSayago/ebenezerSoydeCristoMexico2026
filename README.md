@@ -17,6 +17,7 @@ Este proyecto tiene como objetivo centralizar en una sola aplicación el proceso
 - Control y seguimiento de pedidos
 - Integración futura con pagos en línea
 - Administración interna desde un dashboard o CRM
+- Sistema de Pago con Stripe y Node JS
 
 La solución será construida con una arquitectura moderna y escalable utilizando:
 
