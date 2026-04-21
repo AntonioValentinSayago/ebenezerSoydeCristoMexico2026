@@ -18,6 +18,7 @@ export type FormState = {
     shirtQuantity: number;
     paymentMethod: PaymentMethod;
     attendeeFile: File | null;
+    breakfastAttendance: "si" | "no" | "";
 };
 /**
  * Types for Shirt

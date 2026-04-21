@@ -13,27 +13,28 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
 
     const initialFormState: FormState = {
         fullName: "",
-        email: "",
         phone: "",
+        breakfastAttendance: "",
+        email: "",
         age: "",
         churchName: "",
         city: "",
         role: "",
         pastorIdFile: null,
         notes: "",
-        attendeesCount: 1,
+        attendeesCount: 0,
         wantsShirt: false,
         shirtSize: "",
-        shirtQuantity: 1,
+        shirtQuantity: 0,
         paymentMethod: "",
-        attendeeFile: null,
+        attendeeFile: null
     };
 
     const [formData, setFormData] = useState<FormState>(initialFormState);
     console.log(setFormData)
     return (
         <div className="grid gap-4 sm:grid-cols-3">
-            <FieldWrapperInput label="Nombre (S)" htmlFor="fullName" required>
+            <FieldWrapperInput label="Nombre Completo" htmlFor="fullName" required>
                 <input
                     id="fullName"
                     name="fullName"
@@ -41,30 +42,6 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                     value={formData.fullName}
                     onChange={handleInputChangeForm}
                     className={inputClassName}
-                    required
-                />
-            </FieldWrapperInput>
-                        <FieldWrapperInput label="Apellidos" htmlFor="fullName" required>
-                <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={handleInputChangeForm}
-                    className={inputClassName}
-                    required
-                />
-            </FieldWrapperInput>
-
-            <FieldWrapperInput label="Correo electrónico" htmlFor="email">
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChangeForm}
-                    className={inputClassName}
-                    placeholder="ejemplo@correo.com"
                     required
                 />
             </FieldWrapperInput>
@@ -82,31 +59,17 @@ const FormRegister = ({ handleInputChangeForm }: handleInputChangeProps) => {
                 />
             </FieldWrapperInput>
 
-            <FieldWrapperInput label="Edad" htmlFor="age">
-                <input
-                    id="age"
-                    name="age"
-                    type="number"
-                    min="1"
-                    value={formData.age}
-                    onChange={handleInputChangeForm}
-                    className={inputClassName}
-                    placeholder="Ej. 25"
-                />
-            </FieldWrapperInput>
-
-            <FieldWrapperInput label="Rol" htmlFor="role" required>
+            <FieldWrapperInput label="¿Asistirá al desayuno de pastores?" htmlFor="breakfastAttendance">
                 <select
-                    id="role"
-                    name="role"
-                    value={formData.role}
+                    id="breakfastAttendance"
+                    name="breakfastAttendance"
+                    value={formData.breakfastAttendance}
                     onChange={handleInputChangeForm}
                     className={inputClassName}
-                    required
                 >
-                    <option value="">Selecciona un rol</option>
-                    <option value="pastor">Pastor</option>
-                    <option value="siervo">Siervo</option>
+                    <option value="" disabled>Seleccione una opción</option>
+                    <option value="si">Sí</option>
+                    <option value="no">No</option>
                 </select>
             </FieldWrapperInput>
         </div>

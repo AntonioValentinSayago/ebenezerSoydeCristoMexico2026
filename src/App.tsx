@@ -250,11 +250,6 @@ export default function EventAttendanceForm() {
             ) : null}
 
             <section>
-              <SectionHeading
-                title="Formulario de Resgitro"
-                description="Iinformación de la persona que asistirá al evento."
-              />
-
               <FormRegister 
                 handleInputChangeForm={handleInputChange}
               />
