@@ -1,4 +1,4 @@
-# Soy de Cristo México 2026 | Registro y compras para asistentes
+# Soy de Cristo México 2026 | Registro y compras para asistentes.   Suspendido
 
 Aplicación web desarrollada para gestionar el **registro de asistentes** al evento **Soy de Cristo México 2026** de las **Iglesias Ebenezer**.  
 La plataforma permitirá que cada persona pueda **registrarse al evento** y, dentro del mismo flujo, también pueda realizar la **compra de productos oficiales**, como **playeras**, seleccionando **talla**, **cantidad** y otros detalles necesarios para su pedido.
@@ -17,6 +17,7 @@ Este proyecto tiene como objetivo centralizar en una sola aplicación el proceso
 - Control y seguimiento de pedidos
 - Integración futura con pagos en línea
 - Administración interna desde un dashboard o CRM
+- Sistema de Pago con Stripe y Node JS
 
 La solución será construida con una arquitectura moderna y escalable utilizando:
 
