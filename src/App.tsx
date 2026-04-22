@@ -246,7 +246,7 @@ Adjunto mi comprobante.
                   <p><b>Cuenta:</b> 5204166221164793</p>
                   <p><b>Monto:</b> $180 MXN</p>
                   <p className="mt-2 text-xs">
-                    Después de realizar el pago, envía tu comprobante por WhatsApp, en caso de ir acompañado adjuntar ambos folios de registro.
+                    Después de realizar el pago, envía tu comprobante por WhatsApp colocando como concepto nombre y apellido, en caso de ir acompañado adjuntar ambos folios de registro.
                     <a
                       href={getWhatsAppLink()}
                       target="_blank"
