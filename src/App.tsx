@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 import bgImage from "./assets/fondoSoydeCristoRojo.jpg";
+import NavHeader from "./components/NavHeader";
 
 /**
  * Tipos
@@ -132,9 +133,10 @@ export default function EventAttendanceForm() {
 
   return (
     <main
-      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
-      style={{ backgroundImage: `url(${bgImage})` }}
+    className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
+    style={{ backgroundImage: `url(${bgImage})` }}
     >
+    <NavHeader />
       <div className="w-full max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-2">
 
