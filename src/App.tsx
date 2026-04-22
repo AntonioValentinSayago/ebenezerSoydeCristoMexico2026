@@ -112,6 +112,26 @@ export default function EventAttendanceForm() {
     }
   };
 
+  /** Funcion para el envio del numero */
+  const getWhatsAppLink = () => {
+    const phoneNumber = "5575373203"; // 👈 número del pastor
+
+    if (!submittedData) return "#";
+
+    const message = `
+Hola, realicé mi pago para el almuerzo de Pastores".
+
+Nombre: ${submittedData.fullName}
+Teléfono: ${submittedData.phone}
+Iglesia: ${submittedData.churchName}
+Folio: ${submittedData.folio}
+
+Adjunto mi comprobante.
+  `;
+
+    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  };
+
   const resetForm = () => {
     setFormData({
       fullName: "",
@@ -218,6 +238,27 @@ export default function EventAttendanceForm() {
                 <b>Asistencia:</b>{" "}
                 {submittedData.willAttend === "si" ? "Sí asistirá" : "No asistirá"}
               </p>
+              {submittedData.willAttend === "si" ?
+                <div className="mt-4 p-4 rounded-xl bg-yellow-200 text-black text-sm">
+                  <p className="font-bold mb-2">💳 Datos para pago</p>
+                  <p><b>Banco:</b> Banamex </p>
+                  <p><b>Nombre del Titular:</b> Pablo Benito Peña Salazar </p>
+                  <p><b>Cuenta:</b> 5204166221164793</p>
+                  <p><b>Monto:</b> $180 MXN</p>
+                  <p className="mt-2 text-xs">
+                    Después de realizar el pago, envía tu comprobante por WhatsApp, en caso de ir acompañado adjuntar ambos folios de registro.
+                    <a
+                      href={getWhatsAppLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 block text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
+                    >
+                      Enviar comprobante por WhatsApp
+                    </a>
+                  </p>
+                </div>
+                : ""}
+
             </div>
           )}
         </div>
