@@ -10,6 +10,7 @@ type AttendanceOption = "" | "si" | "no";
 type FormState = {
   fullName: string;
   phone: string;
+  churchName: string; // 🔥 NUEVO
   willAttend: AttendanceOption;
 };
 
@@ -17,12 +18,13 @@ type SubmittedState = FormState & {
   folio: string;
 };
 
-const API_URL = "http://localhost:4000/api/v1/register";
+const API_URL = "https://soydecristoelavivamientomexico.onrender.com/api/v1/register";
 
 export default function EventAttendanceForm() {
   const [formData, setFormData] = useState<FormState>({
     fullName: "",
     phone: "",
+    churchName: "", // 🔥 NUEVO
     willAttend: "",
   });
 
@@ -30,12 +32,8 @@ export default function EventAttendanceForm() {
   const [formError, setFormError] = useState("");
   const [submittedData, setSubmittedData] = useState<SubmittedState | null>(null);
 
-  // 🔥 Modal
   const [showModal, setShowModal] = useState(false);
 
-  /**
-   * Cargar desde localStorage al iniciar
-   */
   useEffect(() => {
     const saved = localStorage.getItem("event_registration");
     if (saved) {
@@ -43,9 +41,6 @@ export default function EventAttendanceForm() {
     }
   }, []);
 
-  /**
-   * Handle inputs
-   */
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -59,14 +54,12 @@ export default function EventAttendanceForm() {
     }));
   };
 
-  /**
-   * Submit con API real
-   */
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
 
-    if (!formData.fullName || !formData.phone || !formData.willAttend) {
+    // 🔥 VALIDACIÓN ACTUALIZADA
+    if (!formData.fullName || !formData.phone || !formData.churchName || !formData.willAttend) {
       setFormError("Todos los campos son obligatorios.");
       return;
     }
@@ -77,6 +70,7 @@ export default function EventAttendanceForm() {
       const payload = {
         fullName: formData.fullName,
         phone: formData.phone,
+        churchName: formData.churchName, // 🔥 NUEVO
         willAttend: formData.willAttend,
       };
 
@@ -99,19 +93,15 @@ export default function EventAttendanceForm() {
         folio: data.data.folio,
       };
 
-      // 🔥 Guardar en estado
       setSubmittedData(result);
-
-      // 🔥 Guardar en localStorage
       localStorage.setItem("event_registration", JSON.stringify(result));
-
-      // 🔥 Mostrar modal
       setShowModal(true);
 
-      // 🔥 Limpiar formulario
+      // 🔥 LIMPIAR FORM
       setFormData({
         fullName: "",
         phone: "",
+        churchName: "",
         willAttend: "",
       });
 
@@ -126,6 +116,7 @@ export default function EventAttendanceForm() {
     setFormData({
       fullName: "",
       phone: "",
+      churchName: "",
       willAttend: "",
     });
     setFormError("");
@@ -133,20 +124,20 @@ export default function EventAttendanceForm() {
 
   return (
     <main
-    className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
-    style={{ backgroundImage: `url(${bgImage})` }}
+      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
+      style={{ backgroundImage: `url(${bgImage})` }}
     >
       <div className="w-full max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-2">
 
-    <NavHeader />
-          {/* FORM */}
+          <NavHeader />
+
           <form
             onSubmit={handleSubmit}
             className="w-full rounded-3xl bg-zinc-900/95 p-6 text-white shadow-xl"
           >
             <h2 className="text-xl font-bold text-center mb-6">
-              Formulario de Registro
+              Formulario de Registro para el almuerzo de Pastores con un costo de $180
             </h2>
 
             {formError && (
@@ -173,13 +164,22 @@ export default function EventAttendanceForm() {
                 className="w-full rounded-xl p-3 text-black bg-white"
               />
 
+              {/* 🔥 NUEVO INPUT */}
+              <input
+                name="churchName"
+                placeholder="Nombre de la iglesia"
+                value={formData.churchName}
+                onChange={handleInputChange}
+                className="w-full rounded-xl p-3 text-black bg-white"
+              />
+
               <select
                 name="willAttend"
                 value={formData.willAttend}
                 onChange={handleInputChange}
                 className="w-full rounded-xl p-3 text-black bg-white"
               >
-                <option value="">¿Asistirá al desayuno de Pastores?</option>
+                <option value="">¿Asistirá al almuerzo de Pastores?</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
@@ -204,7 +204,6 @@ export default function EventAttendanceForm() {
             </div>
           </form>
 
-          {/* RESULTADO */}
           {submittedData && (
             <div className="rounded-3xl bg-white p-6 shadow-xl">
               <h3 className="text-xl font-bold mb-4">
@@ -214,6 +213,7 @@ export default function EventAttendanceForm() {
               <p><b>Folio:</b> {submittedData.folio}</p>
               <p><b>Nombre:</b> {submittedData.fullName}</p>
               <p><b>Teléfono:</b> {submittedData.phone}</p>
+              <p><b>Iglesia:</b> {submittedData.churchName}</p> {/* 🔥 NUEVO */}
               <p>
                 <b>Asistencia:</b>{" "}
                 {submittedData.willAttend === "si" ? "Sí asistirá" : "No asistirá"}
@@ -223,7 +223,6 @@ export default function EventAttendanceForm() {
         </div>
       </div>
 
-      {/* 🔥 MODAL */}
       {showModal && submittedData && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-[90%] max-w-md text-center shadow-xl">
