@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 import bgImage from "./assets/fondoSoydeCristoRojo.jpg";
 
 /**
@@ -16,18 +16,7 @@ type SubmittedState = FormState & {
   folio: string;
 };
 
-/**
- * Generador de folio (temporal)
- */
-const generateFolio = () => {
-  const date = new Date();
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  const random = Math.floor(1000 + Math.random() * 9000);
-
-  return `SDC-${yyyy}${mm}${dd}-${random}`;
-};
+const API_URL = "http://localhost:4000/api/v1/register";
 
 export default function EventAttendanceForm() {
   const [formData, setFormData] = useState<FormState>({
@@ -39,6 +28,19 @@ export default function EventAttendanceForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [submittedData, setSubmittedData] = useState<SubmittedState | null>(null);
+
+  // 🔥 Modal
+  const [showModal, setShowModal] = useState(false);
+
+  /**
+   * Cargar desde localStorage al iniciar
+   */
+  useEffect(() => {
+    const saved = localStorage.getItem("event_registration");
+    if (saved) {
+      setSubmittedData(JSON.parse(saved));
+    }
+  }, []);
 
   /**
    * Handle inputs
@@ -57,7 +59,7 @@ export default function EventAttendanceForm() {
   };
 
   /**
-   * Submit listo para backend
+   * Submit con API real
    */
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,28 +73,49 @@ export default function EventAttendanceForm() {
     setIsSubmitting(true);
 
     try {
-      const folio = generateFolio();
-
-      const payload: SubmittedState = {
-        ...formData,
-        folio,
+      const payload = {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        willAttend: formData.willAttend,
       };
 
-      console.log("Payload listo para backend:", payload);
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      /**
-       * FUTURO BACKEND
-       * await fetch("/api/register", { ... })
-       */
+      const data = await res.json();
 
-      await new Promise((res) => setTimeout(res, 800));
+      if (!res.ok) {
+        throw new Error(data.message || "Error en el registro");
+      }
 
-      setSubmittedData(payload);
+      const result: SubmittedState = {
+        ...payload,
+        folio: data.data.folio,
+      };
 
-      alert(`Registro exitoso. Tu folio es: ${folio}`);
-    } catch (error) {
-      console.error(error);
-      setFormError("Error al registrar.");
+      // 🔥 Guardar en estado
+      setSubmittedData(result);
+
+      // 🔥 Guardar en localStorage
+      localStorage.setItem("event_registration", JSON.stringify(result));
+
+      // 🔥 Mostrar modal
+      setShowModal(true);
+
+      // 🔥 Limpiar formulario
+      setFormData({
+        fullName: "",
+        phone: "",
+        willAttend: "",
+      });
+
+    } catch (error: any) {
+      setFormError(error.message || "Error al registrar.");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,25 +127,24 @@ export default function EventAttendanceForm() {
       phone: "",
       willAttend: "",
     });
-    setSubmittedData(null);
     setFormError("");
   };
 
   return (
     <main
-      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8"
+      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <div className="w-full max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-2">
-          
+
           {/* FORM */}
           <form
             onSubmit={handleSubmit}
-            className="w-full rounded-3xl bg-zinc-900/95 backdrop-blur p-5 sm:p-6 md:p-8 text-white shadow-xl"
+            className="w-full rounded-3xl bg-zinc-900/95 p-6 text-white shadow-xl"
           >
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-6">
-              Registro Evento "Soy de Cristo"
+            <h2 className="text-xl font-bold text-center mb-6">
+              Formulario de Registro
             </h2>
 
             {formError && (
@@ -131,45 +153,41 @@ export default function EventAttendanceForm() {
               </div>
             )}
 
-            <div className="grid gap-4 sm:gap-5">
-              
-              {/* Nombre */}
+            <div className="grid gap-4">
+
               <input
                 name="fullName"
                 placeholder="Nombre completo"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="w-full rounded-xl p-3 text-black outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full rounded-xl p-3 text-black bg-white"
               />
 
-              {/* Teléfono */}
               <input
                 name="phone"
                 placeholder="Teléfono"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full rounded-xl p-3 text-black outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full rounded-xl p-3 text-black bg-white"
               />
 
-              {/* Asistencia */}
               <select
                 name="willAttend"
                 value={formData.willAttend}
                 onChange={handleInputChange}
-                className="w-full rounded-xl p-3 text-black outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full rounded-xl p-3 text-black bg-white"
               >
-                <option value="">¿Asistirá al evento de pastores?</option>
+                <option value="">¿Asistirá al desayuno de Pastores?</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
             </div>
 
-            {/* BOTONES */}
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <div className="mt-6 flex gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto flex-1 bg-red-500 hover:bg-red-600 transition py-3 rounded-xl font-semibold"
+                className="flex-1 bg-red-500 hover:bg-red-600 py-3 rounded-xl"
               >
                 {isSubmitting ? "Guardando..." : "Registrar"}
               </button>
@@ -177,7 +195,7 @@ export default function EventAttendanceForm() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="w-full sm:w-auto flex-1 bg-gray-300 text-black hover:bg-gray-400 transition py-3 rounded-xl"
+                className="flex-1 bg-gray-300 text-black py-3 rounded-xl"
               >
                 Limpiar
               </button>
@@ -186,35 +204,45 @@ export default function EventAttendanceForm() {
 
           {/* RESULTADO */}
           {submittedData && (
-            <div className="w-full rounded-3xl bg-white p-5 sm:p-6 md:p-8 shadow-xl">
-              <h3 className="text-lg sm:text-xl font-bold mb-4">
+            <div className="rounded-3xl bg-white p-6 shadow-xl">
+              <h3 className="text-xl font-bold mb-4">
                 Registro guardado
               </h3>
 
-              <div className="space-y-2 text-sm sm:text-base">
-                <p>
-                  <span className="font-semibold">Folio:</span>{" "}
-                  {submittedData.folio}
-                </p>
-                <p>
-                  <span className="font-semibold">Nombre:</span>{" "}
-                  {submittedData.fullName}
-                </p>
-                <p>
-                  <span className="font-semibold">Teléfono:</span>{" "}
-                  {submittedData.phone}
-                </p>
-                <p>
-                  <span className="font-semibold">Asistencia:</span>{" "}
-                  {submittedData.willAttend === "si"
-                    ? "Sí asistirá"
-                    : "No asistirá"}
-                </p>
-              </div>
+              <p><b>Folio:</b> {submittedData.folio}</p>
+              <p><b>Nombre:</b> {submittedData.fullName}</p>
+              <p><b>Teléfono:</b> {submittedData.phone}</p>
+              <p>
+                <b>Asistencia:</b>{" "}
+                {submittedData.willAttend === "si" ? "Sí asistirá" : "No asistirá"}
+              </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* 🔥 MODAL */}
+      {showModal && submittedData && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-md text-center shadow-xl">
+            <h2 className="text-xl font-bold mb-4">
+              Registro exitoso 🎉
+            </h2>
+
+            <p className="mb-2">Tu folio es:</p>
+            <p className="text-2xl font-black text-red-600 mb-4">
+              {submittedData.folio}
+            </p>
+
+            <button
+              onClick={() => setShowModal(false)}
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
