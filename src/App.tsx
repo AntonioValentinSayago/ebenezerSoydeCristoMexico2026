@@ -136,10 +136,10 @@ export default function EventAttendanceForm() {
     className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
     style={{ backgroundImage: `url(${bgImage})` }}
     >
-    <NavHeader />
       <div className="w-full max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-2">
 
+    <NavHeader />
           {/* FORM */}
           <form
             onSubmit={handleSubmit}
