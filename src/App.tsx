@@ -241,19 +241,16 @@ Adjunto comprobante.
               </div>
 
               {formData.hasCompanions && (
-                <input
+                <><label>Número de acompañantes</label><input
                   type="number"
                   min={1}
                   placeholder="Número de acompañantes"
                   value={formData.companionsCount}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      companionsCount: Number(e.target.value),
-                    }))
-                  }
-                  className="w-full rounded-xl p-3 text-black bg-white"
-                />
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    companionsCount: Number(e.target.value),
+                  }))}
+                  className="w-full rounded-xl p-3 text-black bg-white" /></>
               )}
             </div>
 
@@ -299,7 +296,7 @@ Adjunto comprobante.
               </p>
 
               {submittedData.willAttend === "si" && (
-                <div className="mt-4 p-4 rounded-xl bg-yellow-200 text-black text-sm">
+                <div className="mt-4 p-4 rounded-xl bg-yellow-300 text-black text-sm">
                   <p className="font-bold mb-2">💳 Datos para pago</p>
                   <p><b>Banco:</b> Banamex</p>
                   <p><b>Nombre del Titular:</b> Pablo Benito Peña Salazar</p>
