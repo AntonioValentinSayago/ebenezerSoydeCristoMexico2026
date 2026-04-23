@@ -10,8 +10,10 @@ type AttendanceOption = "" | "si" | "no";
 type FormState = {
   fullName: string;
   phone: string;
-  churchName: string; // 🔥 NUEVO
+  churchName: string;
   willAttend: AttendanceOption;
+  hasCompanions: boolean;       // 🔥 NUEVO
+  companionsCount: number;      // 🔥 NUEVO
 };
 
 type SubmittedState = FormState & {
@@ -24,15 +26,18 @@ export default function EventAttendanceForm() {
   const [formData, setFormData] = useState<FormState>({
     fullName: "",
     phone: "",
-    churchName: "", // 🔥 NUEVO
+    churchName: "",
     willAttend: "",
+    hasCompanions: false,
+    companionsCount: 0,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [submittedData, setSubmittedData] = useState<SubmittedState | null>(null);
-
   const [showModal, setShowModal] = useState(false);
+
+  const PRICE = 180;
 
   useEffect(() => {
     const saved = localStorage.getItem("event_registration");
@@ -54,11 +59,20 @@ export default function EventAttendanceForm() {
     }));
   };
 
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      hasCompanions: checked,
+      companionsCount: checked ? prev.companionsCount : 0,
+    }));
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError("");
 
-    // 🔥 VALIDACIÓN ACTUALIZADA
     if (!formData.fullName || !formData.phone || !formData.churchName || !formData.willAttend) {
       setFormError("Todos los campos son obligatorios.");
       return;
@@ -70,8 +84,10 @@ export default function EventAttendanceForm() {
       const payload = {
         fullName: formData.fullName,
         phone: formData.phone,
-        churchName: formData.churchName, // 🔥 NUEVO
+        churchName: formData.churchName,
         willAttend: formData.willAttend,
+        hasCompanions: formData.hasCompanions,
+        companionsCount: formData.companionsCount,
       };
 
       const res = await fetch(API_URL, {
@@ -97,12 +113,13 @@ export default function EventAttendanceForm() {
       localStorage.setItem("event_registration", JSON.stringify(result));
       setShowModal(true);
 
-      // 🔥 LIMPIAR FORM
       setFormData({
         fullName: "",
         phone: "",
         churchName: "",
         willAttend: "",
+        hasCompanions: false,
+        companionsCount: 0,
       });
 
     } catch (error: any) {
@@ -112,22 +129,30 @@ export default function EventAttendanceForm() {
     }
   };
 
-  /** Funcion para el envio del numero */
+  const totalPeople =
+    1 + (submittedData?.hasCompanions ? submittedData.companionsCount : 0);
+
+  const totalAmount = totalPeople * PRICE;
+
   const getWhatsAppLink = () => {
-    const phoneNumber = "5575373203"; // 👈 número del pastor
+    const phoneNumber = "5575373203";
 
     if (!submittedData) return "#";
 
     const message = `
-Hola, realicé mi pago para el almuerzo de Pastores".
+Hola, realicé mi pago para el almuerzo de Pastores.
 
 Nombre: ${submittedData.fullName}
 Teléfono: ${submittedData.phone}
 Iglesia: ${submittedData.churchName}
 Folio: ${submittedData.folio}
 
-Adjunto mi comprobante.
-  `;
+Acompañantes: ${submittedData.hasCompanions ? submittedData.companionsCount : 0}
+Total personas: ${totalPeople}
+Total pagado: $${totalAmount} MXN
+
+Adjunto comprobante.
+    `;
 
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -138,6 +163,8 @@ Adjunto mi comprobante.
       phone: "",
       churchName: "",
       willAttend: "",
+      hasCompanions: false,
+      companionsCount: 0,
     });
     setFormError("");
   };
@@ -184,7 +211,6 @@ Adjunto mi comprobante.
                 className="w-full rounded-xl p-3 text-black bg-white"
               />
 
-              {/* 🔥 NUEVO INPUT */}
               <input
                 name="churchName"
                 placeholder="Nombre de la iglesia"
@@ -203,6 +229,32 @@ Adjunto mi comprobante.
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
+
+              {/* 🔥 ACOMPAÑANTES */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.hasCompanions}
+                  onChange={handleCheckboxChange}
+                />
+                <label>¿Va acompañado?</label>
+              </div>
+
+              {formData.hasCompanions && (
+                <input
+                  type="number"
+                  min={1}
+                  placeholder="Número de acompañantes"
+                  value={formData.companionsCount}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      companionsCount: Number(e.target.value),
+                    }))
+                  }
+                  className="w-full rounded-xl p-3 text-black bg-white"
+                />
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">
@@ -233,32 +285,37 @@ Adjunto mi comprobante.
               <p><b>Folio:</b> {submittedData.folio}</p>
               <p><b>Nombre:</b> {submittedData.fullName}</p>
               <p><b>Teléfono:</b> {submittedData.phone}</p>
-              <p><b>Iglesia:</b> {submittedData.churchName}</p> {/* 🔥 NUEVO */}
+              <p><b>Iglesia:</b> {submittedData.churchName}</p>
+              <p><b>Acompañantes:</b> {submittedData.hasCompanions ? submittedData.companionsCount : 0}</p>
+              <p><b>Total personas:</b> {totalPeople}</p>
+
+              <p className="text-lg font-bold text-green-700">
+                Total a pagar: ${totalAmount} MXN
+              </p>
+
               <p>
                 <b>Asistencia:</b>{" "}
                 {submittedData.willAttend === "si" ? "Sí asistirá" : "No asistirá"}
               </p>
-              {submittedData.willAttend === "si" ?
+
+              {submittedData.willAttend === "si" && (
                 <div className="mt-4 p-4 rounded-xl bg-yellow-200 text-black text-sm">
                   <p className="font-bold mb-2">💳 Datos para pago</p>
-                  <p><b>Banco:</b> Banamex </p>
-                  <p><b>Nombre del Titular:</b> Pablo Benito Peña Salazar </p>
+                  <p><b>Banco:</b> Banamex</p>
+                  <p><b>Nombre del Titular:</b> Pablo Benito Peña Salazar</p>
                   <p><b>Cuenta:</b> 5204166221164793</p>
-                  <p><b>Monto:</b> $180 MXN</p>
-                  <p className="mt-2 text-xs">
-                    Después de realizar el pago, envía tu comprobante por WhatsApp colocando como concepto nombre y apellido, en caso de ir acompañado adjuntar ambos folios de registro.
-                    <a
-                      href={getWhatsAppLink()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-4 block text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
-                    >
-                      Enviar comprobante por WhatsApp
-                    </a>
-                  </p>
-                </div>
-                : ""}
+                  <p><b>Monto total:</b> ${totalAmount} MXN</p>
 
+                  <a
+                    href={getWhatsAppLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 block text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
+                  >
+                    Enviar comprobante por WhatsApp
+                  </a>
+                </div>
+              )}
             </div>
           )}
         </div>
