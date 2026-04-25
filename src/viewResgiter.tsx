@@ -17,8 +17,10 @@ type LocalStatus = {
   attended: boolean;
 };
 
+// const API_URL =
+//   "http://localhost:4000/api/v1/register/consulta";
 const API_URL =
-  "https://soydecristoelavivamientomexico.onrender.com/api/v1/register/consulta";
+   "https://soydecristoelavivamientomexico.onrender.com/api/v1/register/consulta";
 
 const PAGE_SIZE = 20;
 
