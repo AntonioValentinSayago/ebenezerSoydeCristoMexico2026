@@ -320,29 +320,29 @@ Adjunto mi comprobante.
               🎉 Registro exitoso
             </h2>
 
-            <p className="mb-2 text-red-900">El registro quedara completo hasta que se envie el comprobante de pago por WhatsApp</p>
+            <p className="mb-2 text-red-900">El registro quedará completo hasta que se envie el comprobante de pago por WhatsApp</p>
             <p className="mb-2">Tu folio es:</p>
             <p className="text-2xl font-black text-red-600 mb-4">
               {submittedData.folio}
             </p>
 
             <p className="text-sm mb-4">
-              ⚠️ Por favor envía tu comprobante de pago por WhatsApp dando clic en el botón.
+              ⚠️ Por favor envía tu comprobante, el número de cuenta a transferir aparece al cerrar esta ventana, bendiciones.
             </p>
 
-            <a
+            {/* <a
               href={getWhatsAppLink()}
               target="_blank"
               className="block bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold mb-3"
             >
               Enviar comprobante por WhatsApp
-            </a>
+            </a> */}
 
             <button
               onClick={() => setShowModal(false)}
               className="w-full bg-gray-300 py-2 rounded-xl"
             >
-              Cerrar
+              Cerrar Ventana y Transferir.
             </button>
           </div>
         </div>
