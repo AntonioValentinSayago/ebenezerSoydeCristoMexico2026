@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import App from './App.tsx';
 import Dashboard from './viewResgiter.tsx'; // Tu nueva vista
-import DashboardMemresia from './viewMembresia.tsx';
+import DashboardView from './viewMembresia.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,7 +16,7 @@ createRoot(document.getElementById('root')!).render(
         {/* Cuando escribas /registro manualmente, se carga solo la vista nueva */}
         <Route path="/registro" element={<Dashboard />} />
 
-        <Route path="/membresia" element={<DashboardMemresia />} />
+        <Route path="/membresia" element={<DashboardView />} />
 
         {/* Opcional: Cualquier otra ruta también puede ir a App o a un 404 */}
         <Route path="*" element={<App />} />
