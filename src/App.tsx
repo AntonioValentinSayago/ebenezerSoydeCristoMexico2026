@@ -1,13 +1,13 @@
 "use client";
 
-import type {Selection, SortDescriptor} from "@heroui/react";
+import type { Selection, SortDescriptor } from "@heroui/react";
 
-import {Avatar, Button, Checkbox, Chip, Table, cn} from "@heroui/react";
-import {Icon} from "@iconify/react";
-import {useMemo, useState} from "react";
+import { Avatar, Button, Chip, Table, cn, Pagination } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import { useMemo, useState } from "react";
 import Header from "./components/Header";
 
-import logoSoydeCristo2026 from "./assets/logo-vertical.jpg"
+import logoSoydeCristo2026 from "./assets/logo-vertical.jpg";
 
 interface User {
   id: number;
@@ -16,6 +16,8 @@ interface User {
   role: string;
   status: "Active" | "Inactive" | "On Leave";
   email: string;
+  cursos?: string[]; // Agregamos un nuevo campo para los cursos
+  talentos?: string[]; // Agregamos un nuevo campo para los talentos
 }
 
 const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
@@ -28,42 +30,57 @@ const users: User[] = [
   {
     email: "kate@acme.com",
     id: 4586932,
-    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/red.jpg",
+    image_url:
+      "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/red.jpg",
     name: "Kate Moore",
     role: "Chief Executive Officer",
     status: "Active",
+    cursos: ["Ministerio de Jóvenes", "Ministerio de Alabanza"],
+    talentos: ["Liderazgo", "Comunicación"],
   },
   {
     email: "john@acme.com",
     id: 5273849,
-    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
+    image_url:
+      "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
     name: "John Smith",
     role: "Chief Technology Officer",
     status: "Active",
+    cursos: ["Ministerio de Niños", "Ministerio de Hospitalidad"],
+    talentos: ["Tecnología", "Innovación"],
   },
   {
     email: "sara@acme.com",
     id: 7492836,
-    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg",
+    image_url:
+      "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg",
     name: "Sara Johnson",
     role: "Chief Marketing Officer",
     status: "On Leave",
+    cursos: ["Ministerio de Mujeres", "Ministerio de Discipulado"],
+    talentos: ["Marketing", "Estrategia"],
   },
   {
     email: "michael@acme.com",
     id: 8293746,
-    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/purple.jpg",
+    image_url:
+      "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/purple.jpg",
     name: "Michael Brown",
     role: "Chief Financial Officer",
     status: "Active",
+    cursos: ["Ministerio de Varones", "Ministerio de Misiones"],
+    talentos: ["Finanzas", "Planificación"],
   },
   {
     email: "emily@acme.com",
     id: 1234567,
-    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/orange.jpg",
+    image_url:
+      "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/orange.jpg",
     name: "Emily Davis",
     role: "Product Manager",
     status: "Inactive",
+    cursos: ["Ministerio de Jóvenes", "Ministerio de Alabanza"],
+    talentos: ["Gestión de Proyectos", "Comunicación"],
   },
 ];
 
@@ -90,6 +107,8 @@ function SortableColumnHeader({
   );
 }
 
+const ROWS_PER_PAGE = 4;
+
 export function App() {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
@@ -112,13 +131,28 @@ export function App() {
     });
   }, [sortDescriptor]);
 
+  /** Paginacion */
+  const [page, setPage] = useState(1);
+  const totalPages = Math.ceil(users.length / ROWS_PER_PAGE);
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const paginatedItems = useMemo(() => {
+    const start = (page - 1) * ROWS_PER_PAGE;
+    return users.slice(start, start + ROWS_PER_PAGE);
+  }, [page]);
+  const start = (page - 1) * ROWS_PER_PAGE + 1;
+  const end = Math.min(page * ROWS_PER_PAGE, users.length);
+
   return (
-    <div className="p-6 bg-linear-to-br from-blue-100 to-white min-h-screen">
-      <Header logo={logoSoydeCristo2026} churchName="Iglesia Ebenezer - Prinicipe de Paz" />
+    <div className="p-6 bg-linear-to-br from-blue-50 to-white min-h-screen">
+      <Header
+        logo={logoSoydeCristo2026}
+        churchName="Iglesia Ebenezer - Prinicipe de Paz"
+      />
       <Table>
         <Table.ScrollContainer>
           <Table.Content
-            aria-label="Table with custom cells"
+            aria-label="Registro de Hermanos 2026"
             className="min-w-200"
             selectedKeys={selectedKeys}
             selectionMode="multiple"
@@ -127,31 +161,39 @@ export function App() {
             onSortChange={setSortDescriptor}
           >
             <Table.Header>
-              <Table.Column className="pr-0">
-                <Checkbox aria-label="Select all" slot="selection">
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                </Checkbox>
-              </Table.Column>
-              <Table.Column allowsSorting isRowHeader className="after:hidden" id="id">
-                {({sortDirection}) => (
-                  <SortableColumnHeader sortDirection={sortDirection}>Worker ID</SortableColumnHeader>
-                )}
-              </Table.Column>
               <Table.Column allowsSorting id="name">
-                {({sortDirection}) => (
-                  <SortableColumnHeader sortDirection={sortDirection}>Member</SortableColumnHeader>
+                {({ sortDirection }) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>
+                    Datos Personales
+                  </SortableColumnHeader>
                 )}
               </Table.Column>
               <Table.Column allowsSorting id="role">
-                {({sortDirection}) => (
-                  <SortableColumnHeader sortDirection={sortDirection}>Role</SortableColumnHeader>
+                {({ sortDirection }) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>
+                    Ministerios
+                  </SortableColumnHeader>
                 )}
               </Table.Column>
               <Table.Column allowsSorting id="status">
-                {({sortDirection}) => (
-                  <SortableColumnHeader sortDirection={sortDirection}>Status</SortableColumnHeader>
+                {({ sortDirection }) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>
+                    Cobertura
+                  </SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column allowsSorting id="cursos">
+                {({ sortDirection }) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>
+                    Cursos Completados
+                  </SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column allowsSorting id="talentos">
+                {({ sortDirection }) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>
+                    Talentos
+                  </SortableColumnHeader>
                 )}
               </Table.Column>
               <Table.Column className="text-end">Actions</Table.Column>
@@ -159,21 +201,6 @@ export function App() {
             <Table.Body>
               {sortedUsers.map((user) => (
                 <Table.Row key={user.id} id={user.id}>
-                  <Table.Cell className="pr-0">
-                    <Checkbox aria-label={`Select ${user.name}`} slot="selection" variant="secondary">
-                      <Checkbox.Control>
-                        <Checkbox.Indicator />
-                      </Checkbox.Control>
-                    </Checkbox>
-                  </Table.Cell>
-                  <Table.Cell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      #{user.id.toString()}{" "}
-                      <Button isIconOnly size="sm" variant="ghost">
-                        <Icon className="size-4 text-muted" icon="gravity-ui:copy" />
-                      </Button>
-                    </div>
-                  </Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-3">
                       <Avatar size="sm">
@@ -191,11 +218,41 @@ export function App() {
                       </div>
                     </div>
                   </Table.Cell>
-                  <Table.Cell className="min-w-52">{user.role}</Table.Cell>
+                  <Table.Cell className="min-w-52">
+                    {user.cursos?.map((curso) => (
+                      <Chip
+                        key={curso}
+                        color="default"
+                        size="sm"
+                        variant="soft"
+                      >
+                        {curso}
+                      </Chip>
+                    ))}
+                  </Table.Cell>
                   <Table.Cell className="min-w-25">
-                    <Chip color={statusColorMap[user.status]} size="sm" variant="soft">
+                    <Chip
+                      color={statusColorMap[user.status]}
+                      size="sm"
+                      variant="soft"
+                    >
                       {user.status}
                     </Chip>
+                  </Table.Cell>
+                  <Table.Cell className="min-w-52">
+                    {user.role}
+                  </Table.Cell>
+                  <Table.Cell className="min-w-52">
+                    {user.talentos?.map((talento) => (
+                      <Chip
+                        key={talento}
+                        color="default"
+                        size="sm"
+                        variant="soft"
+                      >
+                        {talento}
+                      </Chip>
+                    ))}
                   </Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-1">
@@ -215,6 +272,43 @@ export function App() {
             </Table.Body>
           </Table.Content>
         </Table.ScrollContainer>
+        <Table.Footer>
+          <Pagination size="sm">
+            <Pagination.Summary>
+              {start} to {end} of {users.length} results
+            </Pagination.Summary>
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous
+                  isDisabled={page === 1}
+                  onPress={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  <Pagination.PreviousIcon />
+                  Prev
+                </Pagination.Previous>
+              </Pagination.Item>
+              {pages.map((p) => (
+                <Pagination.Item key={p}>
+                  <Pagination.Link
+                    isActive={p === page}
+                    onPress={() => setPage(p)}
+                  >
+                    {p}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ))}
+              <Pagination.Item>
+                <Pagination.Next
+                  isDisabled={page === totalPages}
+                  onPress={() => setPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Next
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        </Table.Footer>
       </Table>
     </div>
   );
