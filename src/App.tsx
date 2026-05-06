@@ -1,352 +1,221 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
-import bgImage from "./assets/fondoSoydeCristoRojo.jpg";
-import NavHeader from "./components/NavHeader";
+"use client";
 
-type AttendanceOption = "" | "si" | "no";
+import type {Selection, SortDescriptor} from "@heroui/react";
 
-type FormState = {
-  fullName: string;
-  phone: string;
-  churchName: string;
-  willAttend: AttendanceOption;
-  hasCompanions: boolean;
-  companionsCount: number;
+import {Avatar, Button, Checkbox, Chip, Table, cn} from "@heroui/react";
+import {Icon} from "@iconify/react";
+import {useMemo, useState} from "react";
+import Header from "./components/Header";
+
+import logoSoydeCristo2026 from "./assets/logo-vertical.jpg"
+
+interface User {
+  id: number;
+  name: string;
+  image_url: string;
+  role: string;
+  status: "Active" | "Inactive" | "On Leave";
+  email: string;
+}
+
+const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
+  Active: "success",
+  Inactive: "danger",
+  "On Leave": "warning",
 };
 
-type SubmittedState = FormState & {
-  folio: string;
-};
+const users: User[] = [
+  {
+    email: "kate@acme.com",
+    id: 4586932,
+    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/red.jpg",
+    name: "Kate Moore",
+    role: "Chief Executive Officer",
+    status: "Active",
+  },
+  {
+    email: "john@acme.com",
+    id: 5273849,
+    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
+    name: "John Smith",
+    role: "Chief Technology Officer",
+    status: "Active",
+  },
+  {
+    email: "sara@acme.com",
+    id: 7492836,
+    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg",
+    name: "Sara Johnson",
+    role: "Chief Marketing Officer",
+    status: "On Leave",
+  },
+  {
+    email: "michael@acme.com",
+    id: 8293746,
+    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/purple.jpg",
+    name: "Michael Brown",
+    role: "Chief Financial Officer",
+    status: "Active",
+  },
+  {
+    email: "emily@acme.com",
+    id: 1234567,
+    image_url: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/orange.jpg",
+    name: "Emily Davis",
+    role: "Product Manager",
+    status: "Inactive",
+  },
+];
 
-const API_URL = "https://soydecristoelavivamientomexico.onrender.com/api/v1/register";
+function SortableColumnHeader({
+  children,
+  sortDirection,
+}: {
+  children: React.ReactNode;
+  sortDirection?: "ascending" | "descending";
+}) {
+  return (
+    <span className="flex items-center justify-between">
+      {children}
+      {!!sortDirection && (
+        <Icon
+          icon="gravity-ui:chevron-up"
+          className={cn(
+            "size-3 transform transition-transform duration-100 ease-out",
+            sortDirection === "descending" ? "rotate-180" : "",
+          )}
+        />
+      )}
+    </span>
+  );
+}
 
-export default function EventAttendanceForm() {
-  const [formData, setFormData] = useState<FormState>({
-    fullName: "",
-    phone: "",
-    churchName: "",
-    willAttend: "",
-    hasCompanions: false,
-    companionsCount: 0,
+export function App() {
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "name",
+    direction: "ascending",
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
-  const [submittedData, setSubmittedData] = useState<SubmittedState | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) => {
+      const col = sortDescriptor.column as keyof User;
+      const first = String(a[col]);
+      const second = String(b[col]);
+      let cmp = first.localeCompare(second);
 
-  const PRICE = 180;
-
-  useEffect(() => {
-    const saved = localStorage.getItem("event_registration");
-    if (saved) {
-      setSubmittedData(JSON.parse(saved));
-    }
-  }, []);
-
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setFormError("");
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      hasCompanions: checked,
-      companionsCount: checked ? prev.companionsCount : 0,
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFormError("");
-
-    if (!formData.fullName || !formData.phone || !formData.churchName || !formData.willAttend) {
-      setFormError("Todos los campos son obligatorios.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const payload = {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        churchName: formData.churchName,
-        willAttend: formData.willAttend,
-        hasCompanions: formData.hasCompanions,
-        companionsCount: formData.companionsCount,
-      };
-
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Error en el registro");
+      if (sortDescriptor.direction === "descending") {
+        cmp *= -1;
       }
 
-      const result: SubmittedState = {
-        ...payload,
-        folio: data.data.folio,
-      };
-
-      setSubmittedData(result);
-      localStorage.setItem("event_registration", JSON.stringify(result));
-      setShowModal(true);
-
-      setFormData({
-        fullName: "",
-        phone: "",
-        churchName: "",
-        willAttend: "",
-        hasCompanions: false,
-        companionsCount: 0,
-      });
-
-    } catch (error: any) {
-      setFormError(error.message || "Error al registrar.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const totalPeople =
-    1 + (submittedData?.hasCompanions ? submittedData.companionsCount : 0);
-
-  const totalAmount = totalPeople * PRICE;
-
-  const getWhatsAppLink = () => {
-    const phoneNumber = "5575373203";
-
-    if (!submittedData) return "#";
-
-    const message = `
-Hola, ya realicé mi pago para el almuerzo de Pastores.
-
-Nombre: ${submittedData.fullName}
-Teléfono: ${submittedData.phone}
-Iglesia: ${submittedData.churchName}
-Folio: ${submittedData.folio}
-
-Acompañantes: ${submittedData.hasCompanions ? submittedData.companionsCount : 0}
-Total personas: ${totalPeople}
-Total pagado: $${totalAmount} MXN
-
-Adjunto mi comprobante.
-    `;
-
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-  };
-
-  const resetForm = () => {
-    setFormData({
-      fullName: "",
-      phone: "",
-      churchName: "",
-      willAttend: "",
-      hasCompanions: false,
-      companionsCount: 0,
+      return cmp;
     });
-    setFormError("");
-  };
+  }, [sortDescriptor]);
 
   return (
-    <main
-      className="min-h-screen bg-cover bg-center flex items-center justify-center px-4 py-6"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
-      <div className="w-full max-w-5xl space-y-6">
-
-        <NavHeader />
-
-        {/* 🔥 RESULTADO ARRIBA */}
-        {submittedData && (
-          <div className="rounded-3xl bg-white p-6 shadow-xl">
-            <h3 className="text-xl font-bold mb-4 text-center">
-              ✅ Registro guardado
-            </h3>
-
-            <p><b>Folio:</b> {submittedData.folio}</p>
-            <p><b>Nombre:</b> {submittedData.fullName}</p>
-            <p><b>Teléfono:</b> {submittedData.phone}</p>
-            <p><b>Iglesia:</b> {submittedData.churchName}</p>
-            <p><b>Acompañantes:</b> {submittedData.hasCompanions ? submittedData.companionsCount : 0}</p>
-            <p><b>Total personas:</b> {totalPeople}</p>
-
-            <p className="text-lg font-bold text-green-700">
-              Total a pagar: ${totalAmount} MXN
-            </p>
-
-            {submittedData.willAttend === "si" && (
-              <div className="mt-4 p-4 rounded-xl bg-yellow-300 text-black text-sm">
-                <p className="font-bold mb-2">💳 Datos para pago</p>
-                <p><b>Banco:</b> Banamex</p>
-                <p><b>Nombre:</b> Pablo Benito Peña Salazar</p>
-                <p><b>Cuenta:</b> 5204166221164793</p>
-                <p><b>Monto total:</b> ${totalAmount} MXN</p>
-
-                <a
-                  href={getWhatsAppLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 block text-center bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold"
-                >
-                  👉 Enviar comprobante por WhatsApp (Dar clic aquí)
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 🔥 FORMULARIO ABAJO */}
-        <form
-          onSubmit={handleSubmit}
-          className="w-full rounded-3xl bg-zinc-900/80 p-6 text-white shadow-xl opacity-90"
-        >
-          <h2 className="text-lg font-bold text-center mb-6">
-            Registro al almuerzo ($180 por persona)
-          </h2>
-
-          {formError && (
-            <div className="mb-4 rounded-xl bg-red-500/20 text-red-200 p-3 text-sm">
-              {formError}
-            </div>
-          )}
-
-          <div className="grid gap-4">
-
-            <input
-              name="fullName"
-              placeholder="Nombre completo"
-              value={formData.fullName}
-              onChange={handleInputChange}
-              className="w-full rounded-xl p-3 text-black bg-white"
-            />
-
-            <input
-              name="phone"
-              placeholder="Teléfono"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="w-full rounded-xl p-3 text-black bg-white"
-            />
-
-            <input
-              name="churchName"
-              placeholder="Nombre de la iglesia"
-              value={formData.churchName}
-              onChange={handleInputChange}
-              className="w-full rounded-xl p-3 text-black bg-white"
-            />
-
-            <select
-              name="willAttend"
-              value={formData.willAttend}
-              onChange={handleInputChange}
-              className="w-full rounded-xl p-3 text-black bg-white"
-            >
-              <option value="">¿Asistirá?</option>
-              <option value="si">Sí</option>
-              <option value="no">No</option>
-            </select>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.hasCompanions}
-                onChange={handleCheckboxChange}
-              />
-              <label>¿Va acompañado?</label>
-            </div>
-
-            {formData.hasCompanions && (
-              <input
-                type="number"
-                min={1}
-                placeholder="Número de acompañantes"
-                value={formData.companionsCount}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    companionsCount: Number(e.target.value),
-                  }))
-                }
-                className="w-full rounded-xl p-3 text-black bg-white"
-              />
-            )}
-          </div>
-
-          <div className="mt-6 flex gap-3">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-red-500 hover:bg-red-600 py-3 rounded-xl"
-            >
-              {isSubmitting ? "Guardando..." : "Registrar"}
-            </button>
-
-            <button
-              type="button"
-              onClick={resetForm}
-              className="flex-1 bg-gray-300 text-black py-3 rounded-xl"
-            >
-              Limpiar
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* 🔥 MODAL MEJORADO */}
-      {showModal && submittedData && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-md text-center shadow-xl">
-            <h2 className="text-xl font-bold mb-4">
-              🎉 Registro exitoso
-            </h2>
-
-            <p className="mb-2 text-red-900">El registro quedará completo hasta que se envie el comprobante de pago por WhatsApp</p>
-            <p className="mb-2">Tu folio es:</p>
-            <p className="text-2xl font-black text-red-600 mb-4">
-              {submittedData.folio}
-            </p>
-
-            <p className="text-sm mb-4">
-              ⚠️ Por favor envía tu comprobante, el número de cuenta a transferir aparece al cerrar esta ventana, bendiciones.
-            </p>
-
-            {/* <a
-              href={getWhatsAppLink()}
-              target="_blank"
-              className="block bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold mb-3"
-            >
-              Enviar comprobante por WhatsApp
-            </a> */}
-
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full bg-gray-300 py-2 rounded-xl"
-            >
-              Cerrar Ventana y Transferir.
-            </button>
-          </div>
-        </div>
-      )}
-    </main>
+    <div className="p-6 bg-linear-to-br from-blue-100 to-white min-h-screen">
+      <Header logo={logoSoydeCristo2026} churchName="Iglesia Ebenezer - Prinicipe de Paz" />
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content
+            aria-label="Table with custom cells"
+            className="min-w-200"
+            selectedKeys={selectedKeys}
+            selectionMode="multiple"
+            sortDescriptor={sortDescriptor}
+            onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
+          >
+            <Table.Header>
+              <Table.Column className="pr-0">
+                <Checkbox aria-label="Select all" slot="selection">
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+                </Checkbox>
+              </Table.Column>
+              <Table.Column allowsSorting isRowHeader className="after:hidden" id="id">
+                {({sortDirection}) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>Worker ID</SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column allowsSorting id="name">
+                {({sortDirection}) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>Member</SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column allowsSorting id="role">
+                {({sortDirection}) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>Role</SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column allowsSorting id="status">
+                {({sortDirection}) => (
+                  <SortableColumnHeader sortDirection={sortDirection}>Status</SortableColumnHeader>
+                )}
+              </Table.Column>
+              <Table.Column className="text-end">Actions</Table.Column>
+            </Table.Header>
+            <Table.Body>
+              {sortedUsers.map((user) => (
+                <Table.Row key={user.id} id={user.id}>
+                  <Table.Cell className="pr-0">
+                    <Checkbox aria-label={`Select ${user.name}`} slot="selection" variant="secondary">
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                    </Checkbox>
+                  </Table.Cell>
+                  <Table.Cell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      #{user.id.toString()}{" "}
+                      <Button isIconOnly size="sm" variant="ghost">
+                        <Icon className="size-4 text-muted" icon="gravity-ui:copy" />
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      <Avatar size="sm">
+                        <Avatar.Image src={user.image_url} />
+                        <Avatar.Fallback>
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </Avatar.Fallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-xs">{user.name}</span>
+                        <span className="text-xs text-muted">{user.email}</span>
+                      </div>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell className="min-w-52">{user.role}</Table.Cell>
+                  <Table.Cell className="min-w-25">
+                    <Chip color={statusColorMap[user.status]} size="sm" variant="soft">
+                      {user.status}
+                    </Chip>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-1">
+                      <Button isIconOnly size="sm" variant="tertiary">
+                        <Icon className="size-4" icon="gravity-ui:eye" />
+                      </Button>
+                      <Button isIconOnly size="sm" variant="tertiary">
+                        <Icon className="size-4" icon="gravity-ui:pencil" />
+                      </Button>
+                      <Button isIconOnly size="sm" variant="danger-soft">
+                        <Icon className="size-4" icon="gravity-ui:trash-bin" />
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+      </Table>
+    </div>
   );
 }
