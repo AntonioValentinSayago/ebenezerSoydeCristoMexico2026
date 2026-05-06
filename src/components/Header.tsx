@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ logo, churchName }) => {
   return (
-    <header className="w-full bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 mb-10 rounded-2xl">
+    <header className="w-full bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 mb-5 rounded-2xl">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         
         {/* Logo + Nombre */}

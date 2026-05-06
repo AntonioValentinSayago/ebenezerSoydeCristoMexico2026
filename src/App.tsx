@@ -2,7 +2,7 @@
 
 import type { Selection, SortDescriptor } from "@heroui/react";
 
-import { Avatar, Button, Chip, Table, cn, Pagination } from "@heroui/react";
+import { Avatar, Button, Chip, Table, cn, Pagination, Alert } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMemo, useState } from "react";
 import Header from "./components/Header";
@@ -149,6 +149,16 @@ export function App() {
         logo={logoSoydeCristo2026}
         churchName="Iglesia Ebenezer - Prinicipe de Paz"
       />
+      <Alert status="warning" className="m-auto mb-5">
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Title>Scheduled maintenance</Alert.Title>
+          <Alert.Description>
+            Our services will be unavailable on Sunday, May 15th from 2:00 AM to 6:00 AM UTC for
+            scheduled maintenance.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert>
       <Table>
         <Table.ScrollContainer>
           <Table.Content
