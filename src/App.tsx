@@ -135,11 +135,6 @@ export function App() {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(users.length / ROWS_PER_PAGE);
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const paginatedItems = useMemo(() => {
-    const start = (page - 1) * ROWS_PER_PAGE;
-    return users.slice(start, start + ROWS_PER_PAGE);
-  }, [page]);
   const start = (page - 1) * ROWS_PER_PAGE + 1;
   const end = Math.min(page * ROWS_PER_PAGE, users.length);
 
